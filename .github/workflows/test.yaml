@@ -25,10 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run:  echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -37,8 +33,8 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.env.php }}-${{ hashFiles('composer.*') }}-${{ matrix.dependencies }}
+          path: vendor
+          key: composer-${{ runner.os }}-${{ matrix.env.php }}-${{ hashFiles('composer.*') }}
           restore-keys: |
             composer-${{ runner.os }}-${{ matrix.env.php }}-${{ hashFiles('composer.*') }}-
             composer-${{ runner.os }}-${{ matrix.env.php }}-
@@ -76,6 +72,7 @@ jobs:
         if: ${{ matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
 
       - name: Run Infection for added files only
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           git fetch --depth=1 origin $GITHUB_BASE_REF
-          vendor/bin/infection -j2 --git-diff-base="origin/develop" --git-diff-filter=A --git-diff-base=origin/$GITHUB_BASE_REF --logger-github --ignore-msi-with-no-mutations
+          vendor/bin/infection -j2 --git-diff-filter=A --git-diff-base=origin/$GITHUB_BASE_REF --logger-github --ignore-msi-with-no-mutations
