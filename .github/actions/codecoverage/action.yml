@@ -8,7 +8,7 @@ runs:
     - name: 'Generate Unit Test Code Coverage Summary Report'
       uses: saschanowak/CloverCodeCoverageSummary@0.3.1
       with:
-        filename: shop/Build/Artifacts/Reports/Unit/clover.xml
+        filename: build/clover.xml
 
     - shell: bash
       run: cat code-coverage-summary.md >> $GITHUB_STEP_SUMMARY
