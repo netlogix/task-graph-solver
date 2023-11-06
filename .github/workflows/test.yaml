@@ -66,7 +66,7 @@ jobs:
           php_extensions: "xdebug"
           configuration: "phpunit.xml"
 
-      - uses: php-action/artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: clover
           path: build/clover.xml
