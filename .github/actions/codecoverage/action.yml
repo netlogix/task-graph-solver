@@ -17,4 +17,4 @@ runs:
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         recreate: true
-        path: code-coverage-merged.md
+        path: code-coverage-summary.md
