@@ -60,7 +60,7 @@ jobs:
 
       - name: 'Generate Code Coverage Report'
         uses: ./.github/actions/codecoverage
-        if: "matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'"
+        if: ${{ matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
 
       - name: Run Infection for added files only
         run: |
