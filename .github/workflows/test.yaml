@@ -1,6 +1,14 @@
 name: CI
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
@@ -19,7 +27,7 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run:  echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -58,11 +66,16 @@ jobs:
           php_extensions: "xdebug"
           configuration: "phpunit.xml"
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: clover
+          path: build/clover.xml
+
       - name: 'Generate Code Coverage Report'
         uses: ./.github/actions/codecoverage
-        if: "matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'"
+        if: ${{ matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
 
       - name: Run Infection for added files only
         run: |
           git fetch --depth=1 origin $GITHUB_BASE_REF
-          php bin/infection -j2 --git-diff-filter=A --git-diff-base=origin/$GITHUB_BASE_REF --logger-github --ignore-msi-with-no-mutations --only-covered
+          vendor/bin/infection -j2 --git-diff-base="origin/develop" --git-diff-filter=A --git-diff-base=origin/$GITHUB_BASE_REF --logger-github --ignore-msi-with-no-mutations
