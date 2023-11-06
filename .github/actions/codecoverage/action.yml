@@ -1,0 +1,20 @@
+name: 'Code Coverage'
+description: 'Create code coverage report for unit and integration tests'
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: 'Generate Unit Test Code Coverage Summary Report'
+      uses: saschanowak/CloverCodeCoverageSummary@0.3.1
+      with:
+        filename: shop/Build/Artifacts/Reports/Unit/clover.xml
+
+    - shell: bash
+      run: cat code-coverage-summary.md >> $GITHUB_STEP_SUMMARY
+
+    - name: 'Add Code Coverage as PR Comment'
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        recreate: true
+        path: code-coverage-merged.md
