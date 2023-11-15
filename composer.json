@@ -20,7 +20,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "*",
-        "infection/infection": "*"
+        "infection/infection": "*",
+        "netlogix/coding-guidelines-php": "^1.0"
     },
     "config": {
         "allow-plugins": {
@@ -28,6 +29,8 @@
         }
     },
     "scripts": {
+        "lint": "ecs check",
+        "lint-fix": "ecs check --fix",
         "test": "phpunit",
         "infection": "infection",
         "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage"
