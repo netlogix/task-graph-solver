@@ -1,23 +1,25 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Netlogix\DependencyResolver;
 
-use Traversable;
+use Exception;
+use Generator;
+use InvalidArgumentException;
+use IteratorAggregate;
 
-class TaskGraph implements \IteratorAggregate
+class TaskGraph implements IteratorAggregate
 {
-    function __construct(
+    public function __construct(
         private readonly TaskPoolInterface $tasks
-    )
-    {
+    ) {
     }
 
     /**
-     * @return \Generator<\Generator<Task>>
-     * @throws \Exception
+     * @return Generator<Generator<Task>>
      */
-    public function getIterator(): \Generator
+    public function getIterator(): Generator
     {
         $tasksToResolve = [];
 
@@ -41,17 +43,18 @@ class TaskGraph implements \IteratorAggregate
                 !$this->hasResolvableTasks($tasksToResolve, $resolvedTasks) &&
                 !empty($tasksToResolve)
             ) {
-                throw new \Exception("Dependency cycle detected. Cannot resolve dependencies.");
+                throw new Exception("Dependency cycle detected. Cannot resolve dependencies.");
             }
         }
     }
 
     private function hasResolvableTasks(iterable $tasksToResolve, array $resolvedTasks): bool
     {
-        return $this->getResolvableTasks($tasksToResolve, $resolvedTasks)->valid();
+        return $this->getResolvableTasks($tasksToResolve, $resolvedTasks)
+            ->valid();
     }
 
-    private function getResolvableTasks(iterable $tasksToResolve, array $resolvedTasks): \Generator
+    private function getResolvableTasks(iterable $tasksToResolve, array $resolvedTasks): Generator
     {
         foreach ($tasksToResolve as $taskName) {
             $task = $this->tasks->getTask($taskName);
@@ -64,7 +67,7 @@ class TaskGraph implements \IteratorAggregate
     public function resetPool(): self
     {
         if (!($this->tasks instanceof ResettableTaskPoolInterface)) {
-            throw new \InvalidArgumentException('TaskPool is not resettable');
+            throw new InvalidArgumentException('TaskPool is not resettable');
         }
 
         $this->tasks->reset();

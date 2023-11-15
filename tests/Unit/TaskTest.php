@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Netlogix\DependencyResolver;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class TaskTest extends TestCase
@@ -50,7 +51,7 @@ class TaskTest extends TestCase
 
     public function testConstructWithInvalidDependencies(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new Task('TaskA', [1, 'TaskC']);
     }
 }

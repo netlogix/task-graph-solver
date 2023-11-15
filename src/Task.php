@@ -1,9 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Netlogix\DependencyResolver;
 
-use JetBrains\PhpStorm\NoReturn;
+use InvalidArgumentException;
 
 class Task implements TaskInterface
 {
@@ -15,13 +16,12 @@ class Task implements TaskInterface
     /**
      * @param array<string> $dependencies
      */
-    function __construct(
+    public function __construct(
         private readonly string $name,
-        private readonly array  $dependencies = []
-    )
-    {
-        if (array_filter($dependencies, fn($i) => !is_string($i))) {
-            throw new \InvalidArgumentException('Dependencies must be strings');
+        private readonly array $dependencies = []
+    ) {
+        if (array_filter($dependencies, fn ($i) => !is_string($i))) {
+            throw new InvalidArgumentException('Dependencies must be strings');
         }
     }
 
@@ -40,12 +40,13 @@ class Task implements TaskInterface
      */
     public function checkDependencies(array $resolvedTasks): bool
     {
-        return [] == array_diff($this->getDependencies(), $resolvedTasks);
+        return [] === array_diff($this->getDependencies(), $resolvedTasks);
     }
 
     public function resolve(): self
     {
         $this->resolved = true;
+
         return $this;
     }
 
@@ -57,6 +58,7 @@ class Task implements TaskInterface
     public function reset(): self
     {
         $this->resolved = false;
+
         return $this;
     }
 }
