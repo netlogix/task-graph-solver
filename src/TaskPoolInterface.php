@@ -1,14 +1,18 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Netlogix\DependencyResolver;
 
-interface TaskPoolInterface extends \IteratorAggregate {
+use IteratorAggregate;
+use Traversable;
 
+interface TaskPoolInterface extends IteratorAggregate
+{
     /**
-     * @return \Traversable<TaskInterface>
+     * @return Traversable<TaskInterface>
      */
-    function getIterator(): \Traversable;
+    public function getIterator(): Traversable;
 
-    function getTask(string $name): TaskInterface;
+    public function getTask(string $name): TaskInterface;
 }

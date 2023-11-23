@@ -1,8 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Netlogix\DependencyResolver\Tests\Unit;
 
+use ArrayIterator;
+use Exception;
+use InvalidArgumentException;
 use Netlogix\DependencyResolver\ResettableTaskPoolInterface;
 use Netlogix\DependencyResolver\Task;
 use Netlogix\DependencyResolver\TaskGraph;
@@ -14,7 +18,8 @@ class TaskGraphTest extends TestCase
     public function testReset(): void
     {
         $taskPool = self::createMock(ResettableTaskPoolInterface::class);
-        $taskPool->expects($this->once())->method('reset');
+        $taskPool->expects($this->once())
+            ->method('reset');
 
         $graph = new TaskGraph($taskPool);
         $graph->resetPool();
@@ -23,7 +28,7 @@ class TaskGraphTest extends TestCase
     public function testResetException(): void
     {
         $taskPool = self::createMock(TaskPoolInterface::class);
-        self::expectException(\InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $graph = new TaskGraph($taskPool);
         $graph->resetPool();
     }
@@ -33,13 +38,15 @@ class TaskGraphTest extends TestCase
         $tasks = [
             'TaskA' => new Task('TaskA'),
             'TaskB' => new Task('TaskB', ['TaskC']),
-            'TaskC' => new Task('TaskC', ['TaskA'])
+            'TaskC' => new Task('TaskC', ['TaskA']),
         ];
 
         $taskPool = self::createMock(TaskPoolInterface::class);
 
-        $taskPool->method('getIterator')->willReturn(new \ArrayIterator($tasks));
-        $taskPool->method('getTask')->willReturnCallback(fn($name) => $tasks[$name]);
+        $taskPool->method('getIterator')
+            ->willReturn(new ArrayIterator($tasks));
+        $taskPool->method('getTask')
+            ->willReturnCallback(fn ($name) => $tasks[$name]);
 
         $graph = new TaskGraph($taskPool);
 
@@ -56,14 +63,12 @@ class TaskGraphTest extends TestCase
 
     public function testResolveCycle(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $taskPool = self::createMock(TaskPoolInterface::class);
 
-        $taskPool->method('getIterator')->willReturn(new \ArrayIterator([
-            new Task('TaskB', ['TaskA']),
-            new Task('TaskA', ['TaskB'])
-        ]));
+        $taskPool->method('getIterator')
+            ->willReturn(new ArrayIterator([new Task('TaskB', ['TaskA']), new Task('TaskA', ['TaskB'])]));
 
         foreach ((new TaskGraph($taskPool))->getIterator() as $tasks) {
             foreach ($tasks as $task) {
