@@ -19,7 +19,7 @@ jobs:
       matrix:
         env:
           - { php: 8.1}
-          - { php: 8.2}
+          - { php: 8.2, coverage: true}
           - { php: 8.3, experimental: true }
 
     steps:
@@ -62,14 +62,9 @@ jobs:
           php_extensions: "xdebug"
           configuration: "phpunit.xml"
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: clover
-          path: build/clover.xml
-
       - name: 'Generate Code Coverage Report'
         uses: ./.github/actions/codecoverage
-        if: ${{ matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        if: ${{ matrix.env.coverage == true && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
 
       - name: Run Infection for added files only
         if: ${{ github.event_name == 'pull_request' }}
