@@ -19,11 +19,11 @@ jobs:
       matrix:
         env:
           - { php: 8.1}
-          - { php: 8.2}
+          - { php: 8.2, coverage: true}
           - { php: 8.3, experimental: true }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -31,7 +31,7 @@ jobs:
           php-version: ${{ matrix.env.php }}
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor
           key: composer-${{ runner.os }}-${{ matrix.env.php }}-${{ hashFiles('composer.*') }}
@@ -53,7 +53,7 @@ jobs:
         run: composer install -o --no-interaction --no-suggest --prefer-dist
 
       - name: PHPUnit tests
-        uses: php-actions/phpunit@v3
+        uses: php-actions/phpunit@v4
         env:
           XDEBUG_MODE: coverage
         with:
@@ -62,14 +62,9 @@ jobs:
           php_extensions: "xdebug"
           configuration: "phpunit.xml"
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: clover
-          path: build/clover.xml
-
       - name: 'Generate Code Coverage Report'
         uses: ./.github/actions/codecoverage
-        if: ${{ matrix.env.php == '8.2' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        if: ${{ matrix.env.coverage == true && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
 
       - name: Run Infection for added files only
         if: ${{ github.event_name == 'pull_request' }}
