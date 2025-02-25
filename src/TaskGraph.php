@@ -22,12 +22,15 @@ class TaskGraph implements IteratorAggregate
     public function getIterator(): Generator
     {
         $tasksToResolve = [];
+        $resolvedTasks = [];
 
         foreach ($this->tasks as $task) {
-            $tasksToResolve[$task->getName()] = $task->getName();
+            if($task->isResolved()) {
+                $resolvedTasks[] = $task->getName();
+            } else {
+                $tasksToResolve[$task->getName()] = $task->getName();
+            }
         }
-
-        $resolvedTasks = [];
 
         while (!empty($tasksToResolve)) {
             yield $this->getResolvableTasks($tasksToResolve, $resolvedTasks);

@@ -76,4 +76,32 @@ class TaskGraphTest extends TestCase
             }
         }
     }
+
+    function testResolveDependenciesWithSomeResolvedTasks(){
+        $tasks = [
+            'TaskA' => new Task('TaskA'),
+            'TaskB' => new Task('TaskB', ['TaskC']),
+            'TaskC' => new Task('TaskC', ['TaskA']),
+        ];
+        $tasks['TaskA']->resolve();
+
+        $taskPool = self::createMock(TaskPoolInterface::class);
+
+        $taskPool->method('getIterator')
+            ->willReturn(new ArrayIterator($tasks));
+        $taskPool->method('getTask')
+            ->willReturnCallback(fn ($name) => $tasks[$name]);
+
+        $graph = new TaskGraph($taskPool);
+
+        $taskList = [];
+        foreach ($graph->getIterator() as $tasks) {
+            foreach ($tasks as $name => $task) {
+                $task->resolve();
+                $taskList[] = $name;
+            }
+        }
+
+        $this->assertEquals(['TaskC', 'TaskB'], $taskList);
+    }
 }
