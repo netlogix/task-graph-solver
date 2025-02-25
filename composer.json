@@ -19,7 +19,7 @@
     "extra": {
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
+        "phpunit/phpunit": "10.5.*|11.5.*",
         "infection/infection": "*",
         "netlogix/coding-guidelines-php": "^1.0"
     },
@@ -31,7 +31,7 @@
     "scripts": {
         "lint": "ecs check",
         "lint-fix": "ecs check --fix",
-        "test": "phpunit",
+        "test": "phpunit --testdox --fail-on-phpunit-deprecation",
         "infection": "infection",
         "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage"
     }
